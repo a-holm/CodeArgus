@@ -1,0 +1,52 @@
+# CodeArgus Configuration Example
+github:
+  repository: "owner/repo-name" # e.g., "octocat/Spoon-Knife"
+  token: "YOUR_GITHUB_API_TOKEN" # *** SECURITY WARNING: Use env variables or secrets management instead! ***
+  # Optional: Base URL for GitHub Enterprise
+  # base_url: "https://github.yourcompany.com/api/v3"
+
+ai:
+  # --- Provider Selection ---
+  provider: "openai" # Options: "openai", "gemini", "anthropic" (future), "local_llm" (uses openai provider type)
+
+  # --- Provider Specific Settings ---
+  openai: # Settings for provider: "openai" or "local_llm"
+    model: "gpt-4-turbo-preview" # Or "gpt-3.5-turbo", or your local model name
+    api_key: "YOUR_OPENAI_API_KEY" # Use env vars/secrets! (Can be sk-..., or often 'ollama'/'none' for local)
+    base_url: null # Set for local LLMs, e.g., "http://localhost:11434/v1" or Azure endpoint
+
+  gemini: # Settings for provider: "gemini"
+    model: "gemini-pro"
+    api_key: "YOUR_GEMINI_API_KEY" # Use env vars/secrets!
+
+  # anthropic: # Future settings for provider: "anthropic"
+    # model: "claude-3-opus-20240229"
+    # api_key: "YOUR_ANTHROPIC_API_KEY" # Use env vars/secrets!
+
+  # --- General AI Settings ---
+  temperature: 0.3 # Optional, provider-dependent interpretation
+  max_tokens: 4000 # Optional, provider-dependent limit
+  strictness_level: "high" # Controls prompt detail/tone (e.g., low, medium, high, pedantic)
+  focus_areas: # Specific areas for harsh critique
+    - "undocumented_changes"
+    - "high_complexity"
+    - "security_vulnerabilities"
+    - "project_impact"
+    - "test_coverage" # Conditionally applied based on project structure
+
+project:
+  local_path: "/path/to/your/local/project/clone" # Absolute or relative path to the codebase
+  # Optional: Explicitly define test directory/markers if needed
+  # test_indicators: ["tests/", "test/"]
+  # test_dependency_markers: ["pytest", "unittest"] # Check requirements.txt/pyproject.toml
+
+reporting:
+  output_dir: "analysis_results" # Directory to save reports
+  terminal_colors: true # Enable/disable colored terminal output
+  # Optional: Log level (DEBUG, INFO, WARNING, ERROR)
+  # log_level: "INFO"
+
+cache: # Caching settings
+  enabled: true # Set to false to disable caching
+  directory: ".code_argus_cache" # Relative path for storing cache files
+  # Optional: max_age_days: 7 # Future: For cache expiry

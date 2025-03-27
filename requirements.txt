@@ -1,0 +1,9 @@
+# Core Dependencies
+PyGithub>=1.59.0 # For GitHub API interaction
+google-generativeai>=0.4.0 # For Google Gemini API
+openai>=1.14.0 # For OpenAI API and compatible endpoints (local LLMs)
+PyYAML>=6.0 # For loading YAML configuration files
+rich>=13.7.0 # For rich terminal output
+
+# Testing Dependencies (optional, usually installed in dev environment)
+pytest>=7.4.0 # For running tests
