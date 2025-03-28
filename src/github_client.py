@@ -1,3 +1,4 @@
+import requests # Added for direct HTTP requests
 from github import Github, GithubException, Auth
 from github.PullRequest import PullRequest
 from typing import List, Optional, Dict, Any
@@ -81,12 +82,48 @@ class GitHubClient:
             GitHubClientError: If the PR is not found or there's an error fetching the diff.
         """
         try:
+            # --- Hybrid Approach: PyGithub for PR object, requests for diff fetch ---
             pr = self._repo.get_pull(pr_number)
-            # PyGithub's get_diff() returns bytes, decode to string
-            diff_content_bytes = pr.get_diff()
-            diff_content = diff_content_bytes.decode('utf-8')
+            diff_url = pr.diff_url
+
+            # Retrieve necessary info from PyGithub requester (using name mangling for internal attrs)
+            # Access auth object via requester
+            token = self._gh.requester.auth.token if self._gh.requester.auth else None
+            user_agent = self._gh.requester._Requester__userAgent
+            timeout = self._gh.requester._Requester__timeout
+
+            headers = {
+                "Accept": "application/vnd.github.v3.diff",
+                "User-Agent": user_agent
+            }
+            if token:
+                headers["Authorization"] = f"token {token}"
+
+            try:
+                response = requests.get(diff_url, headers=headers, timeout=timeout)
+                response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
+
+                # Decode the content (response.content is bytes)
+                diff_content = response.content.decode('utf-8')
+
+            except requests.exceptions.HTTPError as e:
+                status_code = e.response.status_code
+                if status_code == 404:
+                    # Specific error for 404 on the diff URL
+                    raise GitHubClientError(f"Could not fetch diff content for PR #{pr_number} (URL: {diff_url} returned status 404). Check token permissions or URL validity.") from e
+                else:
+                    # General HTTP error during diff fetch
+                    raise GitHubClientError(f"HTTP error {status_code} fetching diff for PR #{pr_number} from {diff_url}: {e}") from e
+            except requests.exceptions.RequestException as e:
+                # Catch other requests library errors (connection, timeout, etc.)
+                raise GitHubClientError(f"Network error fetching diff for PR #{pr_number} from {diff_url}: {e}") from e
+            except Exception as e:
+                 # Catch unexpected errors during the requests call or decoding
+                 raise GitHubClientError(f"Unexpected error during requests-based diff fetch for PR #{pr_number}: {e}") from e
+
             print(f"Fetched diff for PR #{pr_number} ({len(diff_content)} characters).")
             return diff_content
+            # --- End Hybrid Approach ---
         except GithubException as e:
             if e.status == 404:
                 raise GitHubClientError(f"Pull Request #{pr_number} not found in repository {self.repo_name}.") from e
