@@ -1,4 +1,4 @@
-# CodeArgus
+ip# CodeArgus
 
 CodeArgus is an AI-powered GitHub pull request analyzer that scrutinizes every change with ruthless precision. Like the hundred-eyed giant of Greek myth, it never sleeps—mercilessly hunting for code quality issues, architectural inconsistencies, and hidden risks before they infiltrate your codebase.
 
@@ -36,7 +36,6 @@ It fetches open pull requests from a specified GitHub repository, analyzes the c
     ```bash
     pip install -r requirements.txt
     ```
-    *(Optional: If using a `.env` file for secrets, also run `pip install python-dotenv`)*
 
 ## Configuration
 
@@ -52,7 +51,7 @@ It fetches open pull requests from a specified GitHub repository, analyzes the c
     *   **`github`:**
         *   `repository`: The target repository in `"owner/repo"` format (e.g., `"your-username/your-project"`).
         *   `token`: Your GitHub Personal Access Token (PAT) with `repo` scope.
-            *   **SECURITY WARNING:** It is STRONGLY recommended to use environment variables. Set `token: "ENV:GITHUB_TOKEN"` in the file and create an environment variable named `GITHUB_TOKEN` with your PAT value.
+            *   **SECURITY WARNING:** You must place your PAT directly here. Storing secrets in configuration files is a security risk. Ensure `config.yaml` is properly secured (e.g., file permissions) and **never** commit it to version control.
         *   `base_url` (Optional): Use for GitHub Enterprise instances.
 
     *   **`ai`:**
@@ -60,7 +59,7 @@ It fetches open pull requests from a specified GitHub repository, analyzes the c
         *   Configure the corresponding subsection (`openai`, `gemini`):
             *   `model`: The specific model name (e.g., `"gpt-4-turbo-preview"`, `"gemini-pro"`).
             *   `api_key`: Your API key for the selected provider.
-                *   **SECURITY WARNING:** Use environment variables! Set `api_key: "ENV:YOUR_PROVIDER_API_KEY"` (e.g., `ENV:OPENAI_API_KEY`, `ENV:GEMINI_API_KEY`) and define the corresponding environment variable. For many local LLMs using the OpenAI provider, the key might be `"ollama"`, `"none"`, or similar.
+                *   **SECURITY WARNING:** You must place your API key directly here. Storing secrets in configuration files is a security risk. Ensure `config.yaml` is properly secured and **never** commit it to version control. For many local LLMs using the OpenAI provider, the key might be `"ollama"`, `"none"`, or similar.
             *   `base_url` (for `openai` provider): Set this if using a local LLM server or a non-standard OpenAI endpoint (e.g., `"http://localhost:11434/v1"` for Ollama).
         *   `temperature`, `max_tokens`: Optional parameters to control AI generation.
         *   `strictness_level`: Controls the tone/detail of the analysis prompt (e.g., `"high"`).
@@ -77,21 +76,11 @@ It fetches open pull requests from a specified GitHub repository, analyzes the c
         *   `enabled`: Enable/disable AI response caching (`true` or `false`).
         *   `directory`: Directory to store cache files (default: `".code_argus_cache"`).
 
-3.  **Set Environment Variables (Recommended for Secrets):**
-    Define the environment variables you specified in `config.yaml` (e.g., `GITHUB_TOKEN`, `OPENAI_API_KEY`) in your terminal session or using a `.env` file (if you installed `python-dotenv`).
-
-    *Example using `.env` file:*
-    Create a file named `.env` in the project root:
-    ```dotenv
-    GITHUB_TOKEN="ghp_YourGitHubTokenHere"
-    OPENAI_API_KEY="sk-YourOpenAIKeyHere"
-    # GEMINI_API_KEY="YourGeminiKeyHere"
-    ```
-    *(Note: The current `main.py` doesn't automatically load `.env`. You would need to add `from dotenv import load_dotenv; load_dotenv()` at the beginning of `main()` or run the script in a way that loads it, e.g., using `python-dotenv` CLI.)*
+3.  **Security Note:** Ensure your `config.yaml` file containing secrets like API keys and tokens is properly secured (e.g., restrict file permissions) and **never** committed to version control (e.g., add it to your `.gitignore` file).
 
 ## Running CodeArgus
 
-Ensure your virtual environment is active and environment variables are set. Then, run the main script from the project root directory:
+Ensure your virtual environment is active. Then, run the main script from the project root directory:
 
 ```bash
 python -m src.main --config config.yaml

@@ -107,32 +107,7 @@ def load_config(config_path: Optional[str] = None) -> AppConfig:
 
     # TODO: Add more detailed validation of nested structures and types
 
-    # Resolve potential environment variables for sensitive keys
-    # Example for GitHub token:
-    if config_data.get("github", {}).get("token", "").startswith("ENV:"):
-        var_name = config_data["github"]["token"].split(":", 1)[1]
-        env_value = os.getenv(var_name)
-        if not env_value:
-            raise ConfigError(f"Environment variable '{var_name}' specified for github.token not found.")
-        config_data["github"]["token"] = env_value
-
-    # Example for AI API keys (add similar logic for Gemini, Anthropic etc. as needed)
-    if config_data.get("ai", {}).get("openai", {}).get("api_key", "").startswith("ENV:"):
-        var_name = config_data["ai"]["openai"]["api_key"].split(":", 1)[1]
-        env_value = os.getenv(var_name)
-        if not env_value:
-             raise ConfigError(f"Environment variable '{var_name}' specified for ai.openai.api_key not found.")
-        config_data["ai"]["openai"]["api_key"] = env_value
-
-    if config_data.get("ai", {}).get("gemini", {}).get("api_key", "").startswith("ENV:"):
-        var_name = config_data["ai"]["gemini"]["api_key"].split(":", 1)[1]
-        env_value = os.getenv(var_name)
-        if not env_value:
-             raise ConfigError(f"Environment variable '{var_name}' specified for ai.gemini.api_key not found.")
-        config_data["ai"]["gemini"]["api_key"] = env_value
-
-
-    # Cast to AppConfig for type checking, though runtime validation is basic
+       # Cast to AppConfig for type checking, though runtime validation is basic
     # A library like Pydantic could enforce this more strictly
     return config_data # type: ignore
 

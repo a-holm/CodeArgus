@@ -80,8 +80,8 @@ graph TD
     style N fill:#aec,stroke:#333,stroke-width:2px
 ```
 
-*   **`config_loader.py`**: Loads `config.yaml`, validates schema, provides access to settings. Handles secure loading of API keys (recommending environment variables).
-*   **`github_client.py`**: Uses the **`PyGithub` library** to interact with the GitHub API. Handles authentication, fetches open PRs, metadata, and diffs. Manages API interactions.
+*   **`config_loader.py`**: Loads `config.yaml`, validates schema, provides access to settings. Reads all values, including secrets like API keys and tokens, **directly** from the file. **Warning:** Storing secrets directly in configuration files is a security risk. Ensure `config.yaml` is properly secured and excluded from version control.
+*   **`github_client.py`**: Uses the **`PyGithub` library** to interact with the GitHub API. Handles authentication using the token read from config, fetches open PRs, metadata, and diffs. Manages API interactions.
 *   **`local_project_reader.py`**: Reads relevant files from the `local_project_path` specified in the config.
 *   **`ai_analyzer.py`**:
     *   Supports multiple AI providers (Gemini, OpenAI, compatible local LLMs) via an adapter pattern (`AIProvider` interface).
